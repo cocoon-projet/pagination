@@ -12,7 +12,6 @@
 
 namespace Cocoon\Pager;
 
-
 use Traversable;
 use IteratorAggregate;
 
@@ -95,8 +94,12 @@ class Pager implements IteratorAggregate
         } else {
             $page = 1;
         }
-        if($page <= 0) $page = 1;
-        if($page > count($this->pages)) $page = count($this->pages);
+        if ($page <= 0) {
+            $page = 1;
+        }
+        if ($page > count($this->pages)) {
+            $page = count($this->pages);
+        }
         $this->currentPage = (int) $page;
     }
 

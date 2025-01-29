@@ -20,5 +20,11 @@
     "phpunit/phpunit": "^9",
     "php-coveralls/php-coveralls": "^2.1",
     "symfony/var-dumper": "^6.0"
+  },
+  "scripts": {
+      "test": ["vendor/bin/phpcbf",
+      
+              "vendor/bin/phpcs"
+            ]
   }
 }

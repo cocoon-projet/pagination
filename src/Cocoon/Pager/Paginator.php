@@ -33,7 +33,7 @@ class Paginator implements \IteratorAggregate
     public function links($class = 'pagination-sm')
     {
         return $this->pager->links($class);
-    }    
+    }
 
     public function getIterator() :Traversable
     {
