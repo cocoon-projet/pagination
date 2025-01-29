@@ -23,7 +23,6 @@
   },
   "scripts": {
       "test": ["vendor/bin/phpcbf",
-      
               "vendor/bin/phpcs"
             ]
   }
