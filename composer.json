@@ -1,6 +1,6 @@
 {
     "name": "cocoon-projet/pagination",
-    "description": "système de pagination de donneées",
+    "description": "système de pagination de donnees",
     "license": "MIT",
     "autoload": {
         "psr-4": {
