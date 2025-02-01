@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ruleset name="name component">
-    <description>componenent description</description>
+<ruleset name="pagination component">
+    <description>pagination de donnée</description>
 
     <arg name="colors"/>
     <arg value="p"/>
