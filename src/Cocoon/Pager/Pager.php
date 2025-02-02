@@ -1,12 +1,12 @@
 <?php
 
 /*
- * LICENCE
+ * LICENSE
  *
  * (c) Franck Pichot <contact@cocoon-projet.fr>
  *
- * Ce fichier est sous licence MIT.
- * Consulter le fichier LICENCE du projet. LICENSE.txt.
+ * Ce fichier est sous license MIT.
+ * Consulter le fichier LICENSE du project. LICENSE.txt.
  *
  */
 
@@ -31,8 +31,8 @@ class Pager implements IteratorAggregate
     public $pages = [];
     protected $paging;
     protected $requete;
-    protected $offset = 0;
-    protected $currentPage = null;
+    protected int $offset = 0;
+    protected mixed $currentPage = null;
     protected $countData;
     protected $url;
     protected $collection;
@@ -57,13 +57,13 @@ class Pager implements IteratorAggregate
      * Initialise les paramètres pour la pagination
      * Nombre de donnée et nombre de page
      */
-    private function setCountDataAndPage()
+    private function setCountDataAndPage(): void
     {
         $this->countData = $this->requete;
         $this->setCountPage($this->requete);
     }
 
-    private function initOptions($options = [])
+    private function initOptions($options = []): void
     {
         if (isset($options['perpage'])) {
             $this->maxPerPage = $options['perpage'];
@@ -82,7 +82,7 @@ class Pager implements IteratorAggregate
         }
     }
 
-    private function setPaging($paging)
+    private function setPaging($paging): void
     {
         $this->paging = $paging;
     }
@@ -112,7 +112,7 @@ class Pager implements IteratorAggregate
      *
      * @param numeric $data
      */
-    private function setCountPage($data)
+    private function setCountPage($data): void
     {
         $arrPages = [];
         $count = ceil($data / $this->maxPerPage);
@@ -128,7 +128,7 @@ class Pager implements IteratorAggregate
      * @param string $url
      *
      */
-    public function setUrl()
+    public function setUrl(): void
     {
         $requestUri = $_SERVER['REQUEST_URI'];
         if (false !== $pos = strpos($requestUri, '?')) {
@@ -137,12 +137,12 @@ class Pager implements IteratorAggregate
         $this->url = trim($requestUri . strtolower('?page='));
     }
 
-    public function setDelta($delta)
+    public function setDelta($delta): void
     {
         $this->delta = $delta;
     }
 
-    public function setStyling($style)
+    public function setStyling($style): void
     {
         $this->styling = $style;
         if ($style == 'sliding') {

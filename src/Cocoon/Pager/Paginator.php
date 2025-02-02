@@ -2,8 +2,8 @@
 
 namespace Cocoon\Pager;
 
-use Cocoon\Pager\Pager;
 use Traversable;
+use Cocoon\Pager\Pager;
 
 class Paginator implements \IteratorAggregate
 {
