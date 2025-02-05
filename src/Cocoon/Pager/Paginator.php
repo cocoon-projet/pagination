@@ -1,6 +1,6 @@
 <?php
 /*
- * 
+ *
  *
  * (c) Franck Pichot <contact@cocoon-projet.fr>
  *
@@ -12,27 +12,28 @@ namespace Cocoon\Pager;
 
 use Traversable;
 use Cocoon\Pager\Pager;
+
 /**
  * Class Paginator - Initialisation des données pour la pagination
- * 
+ *
  * @author Cocoon-Projet
  * @copyright (c) 2025
  */
 class Paginator implements \IteratorAggregate
 {
     /**
-     * 
+     *
      * @var array
      */
     protected $items;
 
     /**
-     * 
+     *
      * @var object Pager
      */
     protected $pager;
     /**
-     * 
+     *
      * @var int
      */
     protected $total;

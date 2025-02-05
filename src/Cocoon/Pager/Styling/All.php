@@ -1,6 +1,6 @@
 <?php
 /*
- * 
+ *
  *
  * (c) Franck Pichot <contact@cocoon-projet.fr>
  *

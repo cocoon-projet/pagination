@@ -263,8 +263,8 @@ class Pager implements IteratorAggregate
     }
     /**
      * Information sur la pagination
-     * @return array{currentPage: int, firstPage: int, lastPage: int, 
-     * nextPage: int, numPages: int, perpage: mixed, 
+     * @return array{currentPage: int, firstPage: int, lastPage: int,
+     * nextPage: int, numPages: int, perpage: mixed,
      * previousPage: int, styling: string, url: string}
      */
     public function info() :array
