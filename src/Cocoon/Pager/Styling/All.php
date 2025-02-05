@@ -1,6 +1,6 @@
 <?php
 /*
- * LICENCE
+ * 
  *
  * (c) Franck Pichot <contact@cocoon-projet.fr>
  *

@@ -29,7 +29,7 @@ class Pager implements IteratorAggregate
     protected $styling = 'all';
     protected $stylingPager = ['basic', 'all', 'elastic', 'sliding'];
     public $pages = [];
-    protected $paging;
+    protected $paging = 'page';
     protected $requete;
     protected int $offset = 0;
     protected mixed $currentPage = null;
@@ -62,7 +62,11 @@ class Pager implements IteratorAggregate
         $this->countData = $this->requete;
         $this->setCountPage($this->requete);
     }
-
+    /**
+     * Enregistrament des options
+     * @param array $options
+     * @return void
+     */
     private function initOptions($options = []): void
     {
         if (isset($options['perpage'])) {
@@ -81,16 +85,29 @@ class Pager implements IteratorAggregate
             $this->setDelta($options['delta']);
         }
     }
-
+    /**
+     * Determine la variable $_GET dans l'url ("page" par default)
+     * @param string $paging
+     * @return void
+     */
     private function setPaging($paging): void
     {
         $this->paging = $paging;
     }
 
+    public function getPaging()
+    {
+        return $this->paging;
+    }
+    /**
+     * initialise la page courrante
+     * @param array $curentPage
+     * @return void
+     */
     private function initCurrentPage($curentPage) :void
     {
-        if (isset($curentPage['page'])) {
-            $page = $curentPage['page'];
+        if (isset($curentPage[$this->getPaging()])) {
+            $page = $curentPage[$this->getPaging()];
         } else {
             $page = 1;
         }
@@ -102,15 +119,19 @@ class Pager implements IteratorAggregate
         }
         $this->currentPage = (int) $page;
     }
-
+    /**
+     * Enregistre le nombre d'element a paginer
+     * @param mixed $collection
+     * @return void
+     */
     private function setCollection($collection)
     {
         $this->requete = $collection;
     }
 
     /**
-     *
-     * @param numeric $data
+     * Comptabilise le nombre de page
+     * @param int $data
      */
     private function setCountPage($data): void
     {
@@ -134,14 +155,23 @@ class Pager implements IteratorAggregate
         if (false !== $pos = strpos($requestUri, '?')) {
             $requestUri = substr($requestUri, 0, $pos);
         }
-        $this->url = trim($requestUri . strtolower('?page='));
+        $this->url = trim($requestUri . strtolower('?' . $this->getPaging() . '='));
     }
-
+    /**
+     * Modifie les parametre d'affichage de la pagination
+     * Eviter la modification
+     * @param int $delta
+     * @return void
+     */
     public function setDelta($delta): void
     {
         $this->delta = $delta;
     }
-
+    /**
+     * Modifie le style de la pagination
+     * @param string $style
+     * @return void
+     */
     public function setStyling($style): void
     {
         $this->styling = $style;
@@ -167,7 +197,7 @@ class Pager implements IteratorAggregate
 
     public function count(): int
     {
-        return count(array($this->pages));
+        return count($this->pages);
     }
 
     public function getIterator() : Traversable
@@ -229,9 +259,33 @@ class Pager implements IteratorAggregate
 
     public function offset()
     {
-        return $this->getCurrentPage() - 1 * $this->maxPerPage;
+        return ($this->getCurrentPage() - 1) * $this->maxPerPage;
     }
-
+    /**
+     * Information sur la pagination
+     * @return array{currentPage: int, firstPage: int, lastPage: int, 
+     * nextPage: int, numPages: int, perpage: mixed, 
+     * previousPage: int, styling: string, url: string}
+     */
+    public function info() :array
+    {
+        return [
+            "perpage"=> $this->maxPerPage,
+            "numPages" => $this->count(),
+            "styling"=> $this->getStyling(),
+            "url"=> $this->getUrl(),
+            "previousPage"=> $this->getPreviousPage(),
+            "nextPage" => $this->getNextPage(),
+            "currentPage" => $this->getCurrentPage(),
+            "lastPage" => $this->getLastPage(),
+            "firstPage" => $this->getFirstPage()
+        ];
+    }
+    /**
+     * Affichage de la pagination (bootstrap pagination)
+     * @param mixed $class
+     * @throws \Exception
+     */
     public function links($class = 'pagination-sm')
     {
         if ($this->getNbResult() === 0) {

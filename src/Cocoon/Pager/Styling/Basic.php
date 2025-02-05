@@ -1,4 +1,13 @@
 <?php
+/*
+ * 
+ *
+ * (c) Franck Pichot <contact@cocoon-projet.fr>
+ *
+ * Ce fichier est sous licence MIT.
+ * Consulter le fichier LICENCE du projet. LICENSE.txt.
+ *
+ */
 namespace Cocoon\Pager\Styling;
 
 class Basic
@@ -24,10 +33,16 @@ class Basic
         }
         $next = '';
         // page suivante
-        if ($this->pager->getCurrentPage() != $this->pager->count()) {
+        if ($this->pager->getCurrentPage() <= $this->pager->count() or $this->pager->getCurrentPage() == 1) {
+            if($this->pager->getCurrentPage() == $this->pager->count()) {
+                $next = '<li class="page-item disabled" style="margin-left: 20px;"><a class="page-link" href="' .
+                $this->pager->getUrl() . $this->pager->getNextPage() . $this->pager->getAppends() .
+                '" title="Page suivante">Suivant &rarr;</a></li>';
+            } else {
             $next = '<li class="page-item" style="margin-left: 20px;"><a class="page-link" href="' .
                 $this->pager->getUrl() . $this->pager->getNextPage() . $this->pager->getAppends() .
                 '" title="Page suivante">Suivant &rarr;</a></li>';
+            }
         }
         $html_end = '</ul>';
         return $html . $previous . $next . $html_end;
