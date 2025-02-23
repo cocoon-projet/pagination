@@ -23,7 +23,7 @@ use IteratorAggregate;
  */
 class Pager implements IteratorAggregate
 {
-    protected $maxPerPage = 1;
+    protected $maxPerPage;
     //Pour le style sliding 4*2+1
     public $delta = 4;
     protected $styling = 'all';

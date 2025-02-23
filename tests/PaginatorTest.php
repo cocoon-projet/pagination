@@ -2,6 +2,8 @@
 namespace Tests;
 
 use Cocoon\Pager\Paginator;
+use Cocoon\Pager\DataForPage;
+use Cocoon\Pager\PaginatorConfig;
 use PHPUnit\Framework\TestCase;
 
 class PaginatorTest extends TestCase
@@ -29,9 +31,14 @@ class PaginatorTest extends TestCase
             'quize',
             'seize'
         ];
+
         $_SERVER['REQUEST_URI'] = '/';
-        $options['styling'] = 'basic';
-        $p = new Paginator($collection, $options);
-        $this->assertSame(16,$p->count());
+        $items = ($count = count($collection))
+        ? $collection
+        : [];
+        $data = new PaginatorConfig($items, $count);
+        $data->setPerPage(1);
+        $pager = new Paginator($data);
+        $this->assertSame(16, $pager->count());
     }
 }

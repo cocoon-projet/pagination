@@ -12,6 +12,7 @@ namespace Cocoon\Pager;
 
 use Traversable;
 use Cocoon\Pager\Pager;
+use Cocoon\Collection\Collection;
 
 /**
  * Class Paginator - Initialisation des données pour la pagination
@@ -43,10 +44,25 @@ class Paginator implements \IteratorAggregate
      * @param array $items
      * @param array $options perpage-styling-paging-delta
      */
-    public function __construct($items, $options)
+    public function __construct(PaginatorConfig $config)
     {
-        $this->items = $items;
-        $this->total = count($items);
+        $this->items = $config->getData();
+        $this->total = $config->getTotal();
+        $options['perpage'] = $config->getPerPage();
+        $options['paging'] = $config->getForPage();
+        $options['styling'] = $config->getstyling();
+        $page = $_GET[$options['paging']] ?? 1;
+        if (is_array($this->items)) {
+            $this->items = (new Collection($config->getData()))
+            ->slice(($page - 1) * $options['perpage'], $options['perpage'])->all();
+        } elseif (is_object($this->items) && $this->items instanceof \Illuminate\Database\Query\Builder) {
+            $results = $config->getData()->limit($options['perpage'])->offset(($page - 1) * $options['perpage'])->get();
+            if ($results instanceof \Illuminate\Support\Collection) {
+                $this->items = $results->toArray();
+            }
+        } elseif (is_object($this->items) && $this->items instanceof \Cocoon\Database\Query\Builder) {
+            $this->items = $config->getData()->limit($options['perpage'], ($page - 1) * $options['perpage'])->get();
+        }
         $this->pager = new Pager($this->total, $options);
     }
     /**
@@ -74,14 +90,6 @@ class Paginator implements \IteratorAggregate
         return $this->pager->links($class);
     }
     /**
-     * Retourne le nombre d'element a afficher pour une page
-     * @return array
-     */
-    public function data(): array
-    {
-        return array_slice($this->items, $this->pager->offset(), $this->pager->limit());
-    }
-    /**
      * Retourne des informations sur la pagination
      */
     public function info()
@@ -89,7 +97,7 @@ class Paginator implements \IteratorAggregate
         return $this->pager->info();
     }
 
-    public function getIterator() :Traversable
+    public function getIterator(): Traversable
     {
         return new \ArrayIterator($this->items);
     }
