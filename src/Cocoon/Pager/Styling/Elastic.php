@@ -1,74 +1,98 @@
 <?php
+
+declare(strict_types=1);
+
 /*
- * LICENCE
+ * LICENSE
  *
  * (c) Franck Pichot <contact@cocoon-projet.fr>
  *
- * Ce fichier est sous licence MIT.
- * Consulter le fichier LICENCE du projet. LICENSE.txt.
+ * Ce fichier est sous license MIT.
+ * Consulter le fichier LICENSE du project. LICENSE.txt.
  *
  */
 namespace Cocoon\Pager\Styling;
 
-class Elastic
+use Cocoon\Pager\Pager;
+
+/**
+ * Style de pagination élastique
+ * Affiche un nombre variable de pages autour de la page courante
+ */
+final class Elastic implements StylingInterface
 {
-
-    protected $pager;
-    public function __construct($pager)
+    /**
+     * Rend la pagination avec le style élastique
+     */
+    public function render(Pager $pager): string
     {
-        $this->pager = $pager;
-    }
+        $framework = $pager->getCssFrameworkInstance();
+        $html = [];
+        $delta = $pager->getDelta();
+        $currentPage = $pager->getCurrentPage();
+        $lastPage = $pager->getLastPage();
 
-    public function render($class)
-    {
-        $endPrintPages = array_slice(
-            $this->pager->pages,
-            $this->pager->count() - $this->pager->delta,
-            $this->pager->count()
+        // Ouvre le conteneur de pagination
+        $html[] = $framework->openTag();
+
+        // Bouton précédent
+        $html[] = $framework->renderPreviousButton(
+            $pager->getUrlForPage($pager->getPreviousPage()),
+            $pager->onFirstPage()
         );
-        if ($this->pager->getCurrentPage() < $this->pager->delta) {
-            $pages = array_slice($this->pager->pages, 0, $this->pager->delta);
-        } elseif (in_array($this->pager->getCurrentPage(), $endPrintPages)) {
-            $pages = $endPrintPages;
-        } else {
-            $pages = array_slice($this->pager->pages, $this->pager->getCurrentPage() - 2, $this->pager->delta);
-        }
-        $html = '';
-        $html .= '<ul class="pagination ' . $class . '">';
-        if ($this->pager->getCurrentPage() != 1) {
-            $html .= '<li class="page-item"><a class="page-link" href="' .
-                      $this->pager->getUrl() . $this->pager->getPreviousPage() . $this->pager->getAppends() .
-                      '" title="Page précédente" >&laquo;</a></li>';
-        }
-        $printOne = $this->pager->delta - 1;
-        if ($this->pager->getCurrentPage() > $printOne) {
-            $html .= '<li class="page-item"><a class="page-link" href="' .
-                $this->pager->getUrl() . $this->pager->getFirstPage() . $this->pager->getAppends() .
-                '">' . $this->pager->getFirstPage() .
-                '</a></li><li class="page-item disabled"><a class="page-link" href="#">...</a></li>';
-        }
-        foreach ($pages as $page) {
-            if ($page == $this->pager->getCurrentPage()) {
-                $html .= '<li class="page-item active"><a class="page-link" href="#">' . $page . '</a></li>';
-            } else {
-                $html .= '<li class="page-item"><a class="page-link" href="' .
-                    $this->pager->getUrl() . $page . $this->pager->getAppends() .
-                    '">' . $page . '</a></li>';
+
+        // Première page
+        if ($currentPage > ($delta + 1)) {
+            $html[] = $framework->renderPageLink(
+                $pager->getUrlForPage(1),
+                1,
+                false
+            );
+            
+            if ($currentPage > ($delta + 2)) {
+                $html[] = $framework->renderPageLink(
+                    '#',
+                    0,
+                    false
+                );
             }
         }
-        if ($this->pager->getCurrentPage() != $this->pager->getLastPage()
-            && !in_array($this->pager->getLastPage(), $pages)) {
-            $html .= '<li class="page-item disabled"><a class="page-link" href="#">...</a></li>
-                  <li class="page-item"><a class="page-link" href="' .
-                  $this->pager->getUrl() . $this->pager->getLastPage() . $this->pager->getAppends() .
-                  '">' . $this->pager->getLastPage() . '</a></li>';
+
+        // Pages autour de la page courante
+        for ($i = max(1, $currentPage - $delta); $i <= min($lastPage, $currentPage + $delta); $i++) {
+            $html[] = $framework->renderPageLink(
+                $pager->getUrlForPage($i),
+                $i,
+                $i === $currentPage
+            );
         }
-        if ($this->pager->getCurrentPage() != $this->pager->count()) {
-            $html .= '<li class="page-item"><a class="page-link" href="' .
-                $this->pager->getUrl() . $this->pager->getNextPage() . $this->pager->getAppends() .
-                 '" title="Page suivante">&raquo;</a></li>';
+
+        // Dernière page
+        if ($currentPage < ($lastPage - $delta)) {
+            if ($currentPage < ($lastPage - $delta - 1)) {
+                $html[] = $framework->renderPageLink(
+                    '#',
+                    0,
+                    false
+                );
+            }
+            
+            $html[] = $framework->renderPageLink(
+                $pager->getUrlForPage($lastPage),
+                $lastPage,
+                false
+            );
         }
-        $html .= '</ul>';
-        return $html;
+
+        // Bouton suivant
+        $html[] = $framework->renderNextButton(
+            $pager->getUrlForPage($pager->getNextPage()),
+            $pager->onLastPage()
+        );
+
+        // Ferme le conteneur de pagination
+        $html[] = $framework->closeTag();
+
+        return implode('', $html);
     }
 }

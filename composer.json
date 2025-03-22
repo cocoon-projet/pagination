@@ -22,10 +22,5 @@
         "phpunit/phpunit": "^9",
         "php-coveralls/php-coveralls": "^2.1",
         "tracy/tracy": "^2.10"
-    },
-    "scripts": {
-        "test": ["vendor/bin/phpcbf",
-            "vendor/bin/phpcs"
-        ]
     }
 }

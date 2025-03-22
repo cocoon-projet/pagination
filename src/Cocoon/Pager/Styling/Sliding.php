@@ -1,90 +1,100 @@
 <?php
+
+declare(strict_types=1);
+
 /*
- * LICENCE
+ * LICENSE
  *
  * (c) Franck Pichot <contact@cocoon-projet.fr>
  *
- * Ce fichier est sous licence MIT.
- * Consulter le fichier LICENCE du projet. LICENSE.txt.
+ * Ce fichier est sous license MIT.
+ * Consulter le fichier LICENSE du project. LICENSE.txt.
  *
  */
 namespace Cocoon\Pager\Styling;
 
-class Sliding
+use Cocoon\Pager\Pager;
+
+/**
+ * Style de pagination avec fenêtre glissante
+ * Affiche une fenêtre de pages qui se déplace avec la page courante
+ */
+final class Sliding implements StylingInterface
 {
-
-    protected $pager;
-
-    public function __construct($pager)
+    /**
+     * Rend la pagination avec le style sliding
+     */
+    public function render(Pager $pager): string
     {
-        $this->pager = $pager;
-    }
+        $framework = $pager->getCssFrameworkInstance();
+        $html = [];
+        $delta = (int)($pager->getDelta() / 2);
+        $currentPage = $pager->getCurrentPage();
+        $lastPage = $pager->getLastPage();
 
-    public function render($class)
-    {
-        $html = '';
+        // Ouvre le conteneur de pagination
+        $html[] = $framework->openTag();
 
-        //$page_prev = $this->pager->getPreviousPage();
-        //$page_next = $this->pager->getNextPage();
-        $html .= '<ul class="pagination ' . $class . '">';
-        if ($this->pager->getCurrentPage() != 1) {
-            $html .= '<li class="page-item"><a class="page-link" href="' .
-            $this->pager->getUrl() . $this->pager->getPreviousPage() . $this->pager->getAppends() .
-            '">&laquo;</a></li>';
-        }
+        // Bouton précédent
+        $html[] = $framework->renderPreviousButton(
+            $pager->getUrlForPage($pager->getPreviousPage()),
+            $pager->onFirstPage()
+        );
 
-        $page_count = $this->pager->count();
-        $number_paging = $this->pager->delta;
-        $page_padding = floor($number_paging / 2);
+        // Calcul de la fenêtre glissante
+        $start = max(1, $currentPage - $delta);
+        $end = min($lastPage, $currentPage + $delta);
 
-        if ($page_count > $number_paging) {
-            if ($this->pager->getCurrentPage() >= ($page_padding + 1)) {
-                if ($this->pager->getCurrentPage() > ($page_count - $page_padding)) {
-                    $page_start = $page_count - ($page_padding * 2);
-                    $page_end = $page_count;
-                } else {
-                    $page_start = $this->pager->getCurrentPage() - $page_padding;
-                    $page_end = $this->pager->getCurrentPage() + $page_padding;
-                }
-            } else {
-                $page_start = 1;
-                $page_end = ($page_padding * 2) + 1;
-            }
-        } else {
-            $page_start = 1;
-            $page_end = $page_count;
-        }
-        if ($this->pager->getCurrentPage() >= $number_paging) {
-            $html .= '<li class="page-item"><a class="page-link" href="' .
-                $this->pager->getUrl() . $this->pager->getFirstPage() . $this->pager->getAppends() .
-                '">' . $this->pager->getFirstPage() .
-                '</a></li><li class=" page-item disabled"><a class="page-link" href="#">...</a></li>';
-        }
-        $pages = [];
-        for ($t = $page_start; $t <= $page_end; $t++) {
-            $pages[] = $t;
-            $url = $this->pager->getUrl() . $t . $this->pager->getAppends();
-            if ($this->pager->getCurrentPage() == $t) {
-                $html .= '<li class="page-item active">';
-                $html .= '<a class="page-link" href="#">' . $t . '</a>';
-                $html .= '</li>';
-            } else {
-                $html .= '<li class="page-item"><a class="page-link" href="' . $url . '">' . $t . '</a></li>';
+        // Ajuster la fenêtre si nécessaire
+        if ($start > 1) {
+            $html[] = $framework->renderPageLink(
+                $pager->getUrlForPage(1),
+                1,
+                false
+            );
+            if ($start > 2) {
+                $html[] = $framework->renderPageLink(
+                    '#',
+                    0,
+                    false
+                );
             }
         }
-        if ($this->pager->getCurrentPage() != $this->pager->getLastPage() &&
-            !in_array($this->pager->getLastPage(), $pages)) {
-            $html .= '<li class="page-item disabled"><a class="page-link" href="#">...</a></li>'
-                    . '<li class="page-item"><a class="page-link" href="' .
-                $this->pager->getUrl() . $this->pager->getLastPage() . $this->pager->getAppends() . '">' .
-                $this->pager->getLastPage() . '</a></li>';
+
+        // Pages dans la fenêtre
+        for ($i = $start; $i <= $end; $i++) {
+            $html[] = $framework->renderPageLink(
+                $pager->getUrlForPage($i),
+                $i,
+                $i === $currentPage
+            );
         }
-        if ($this->pager->getCurrentPage() != $page_count) {
-            $html .= '<li class="page-item"><a class="page-link" href="' .
-                $this->pager->getUrl() . $this->pager->getNextPage() . $this->pager->getAppends()
-                . '">&raquo;</a></li>';
+
+        // Dernière page si nécessaire
+        if ($end < $lastPage) {
+            if ($end < $lastPage - 1) {
+                $html[] = $framework->renderPageLink(
+                    '#',
+                    0,
+                    false
+                );
+            }
+            $html[] = $framework->renderPageLink(
+                $pager->getUrlForPage($lastPage),
+                $lastPage,
+                false
+            );
         }
-        $html .= '</ul>';
-        return $html;
+
+        // Bouton suivant
+        $html[] = $framework->renderNextButton(
+            $pager->getUrlForPage($pager->getNextPage()),
+            $pager->onLastPage()
+        );
+
+        // Ferme le conteneur de pagination
+        $html[] = $framework->closeTag();
+
+        return implode('', $html);
     }
 }

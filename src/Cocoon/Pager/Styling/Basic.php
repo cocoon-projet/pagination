@@ -1,50 +1,57 @@
 <?php
+
+declare(strict_types=1);
+
 /*
- *
+ * LICENSE
  *
  * (c) Franck Pichot <contact@cocoon-projet.fr>
  *
- * Ce fichier est sous licence MIT.
- * Consulter le fichier LICENCE du projet. LICENSE.txt.
+ * Ce fichier est sous license MIT.
+ * Consulter le fichier LICENSE du project. LICENSE.txt.
  *
  */
 namespace Cocoon\Pager\Styling;
 
-class Basic
+use Cocoon\Pager\Pager;
+
+/**
+ * Style de pagination basique avec boutons précédent/suivant et numéro de page
+ */
+final class Basic implements StylingInterface
 {
-    protected $pager;
-    protected $container;
-
-    public function __construct($pager)
+    /**
+     * Rend la pagination avec le style basique
+     */
+    public function render(Pager $pager): string
     {
-        $this->pager = $pager;
-    }
+        $framework = $pager->getCssFrameworkInstance();
+        $html = [];
 
-    public function render($class)
-    {
-        $html = '';
-        $html .= '<ul class="pagination ' . $class . '">';
-        $previous = '';
-        // Page précédente
-        if ($this->pager->getCurrentPage() != 1) {
-            $previous = '<li class="page-item"><a class="page-link" href="' .
-                $this->pager->getUrl() . $this->pager->getPreviousPage() . $this->pager->getAppends() .
-                '" title="Page précédente" aria-hidden="true">&larr; Précédent</a></li> ';
-        }
-        $next = '';
-        // page suivante
-        if ($this->pager->getCurrentPage() <= $this->pager->count() or $this->pager->getCurrentPage() == 1) {
-            if ($this->pager->getCurrentPage() == $this->pager->count()) {
-                $next = '<li class="page-item disabled" style="margin-left: 20px;"><a class="page-link" href="' .
-                $this->pager->getUrl() . $this->pager->getNextPage() . $this->pager->getAppends() .
-                '" title="Page suivante">Suivant &rarr;</a></li>';
-            } else {
-                $next = '<li class="page-item" style="margin-left: 20px;"><a class="page-link" href="' .
-                $this->pager->getUrl() . $this->pager->getNextPage() . $this->pager->getAppends() .
-                '" title="Page suivante">Suivant &rarr;</a></li>';
-            }
-        }
-        $html_end = '</ul>';
-        return $html . $previous . $next . $html_end;
+        // Ouvre le conteneur de pagination
+        $html[] = $framework->openTag();
+
+        // Bouton précédent
+        $html[] = $framework->renderPreviousButton(
+            $pager->getUrlForPage($pager->getPreviousPage()),
+            $pager->onFirstPage()
+        );
+
+        // Information de page courante
+        $html[] = $framework->renderPageInfo(
+            $pager->getCurrentPage(),
+            $pager->getLastPage()
+        );
+
+        // Bouton suivant
+        $html[] = $framework->renderNextButton(
+            $pager->getUrlForPage($pager->getNextPage()),
+            $pager->onLastPage()
+        );
+
+        // Ferme le conteneur de pagination
+        $html[] = $framework->closeTag();
+
+        return implode('', $html);
     }
 }
