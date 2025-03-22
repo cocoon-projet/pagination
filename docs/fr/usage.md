@@ -6,6 +6,7 @@ Ce guide explique comment utiliser la pagination avec différentes sources de do
 - [Utilisation avec un tableau PHP](#utilisation-avec-un-tableau-php)
 - [Utilisation avec PDO (SQLite/MySQL)](#utilisation-avec-pdo)
 - [Utilisation avec Laravel Query Builder](#utilisation-avec-laravel-query-builder)
+- [Utilisation avec Cocoon ORM](#utilisation-avec-cocoon-orm)
 
 ## Utilisation avec un tableau PHP
 
@@ -101,6 +102,45 @@ foreach ($paginator->items() as $user) {
 // Afficher la pagination
 echo $paginator->render();
 ```
+
+## Utilisation avec Cocoon ORM
+
+La pagination est intégrée nativement dans Cocoon ORM, ce qui simplifie grandement son utilisation :
+
+```php
+// Configuration de la base de données avec pagination
+$config = [
+    'db_connection' => 'sqlite',
+    'db' => [
+        'sqlite' => [
+            'path' => dirname(__DIR__) . '/database/database.sqlite',
+            'mode' => 'development',
+            'db_cache_path' => dirname(__DIR__) . '/database/cache/',
+            'pagination.renderer' => 'bootstrap5' // Définit le framework CSS pour la pagination
+        ]
+    ]
+];
+
+// Initialiser l'ORM
+Orm::manager($config['db_connection'], $config['db']['sqlite']);
+
+// Utiliser la pagination directement dans la requête
+$animaux = DB::table('animaux')->paginate(2); // 2 éléments par page
+
+// Afficher les résultats
+foreach ($animaux->items() as $animal) {
+    echo $animal->name . '<br>';
+}
+
+// Afficher la pagination
+echo $paginator->render();
+```
+
+La pagination avec Cocoon ORM offre plusieurs avantages :
+- Configuration simplifiée dans les paramètres de l'ORM
+- Méthode `paginate()` intégrée au Query Builder
+- Gestion automatique du nombre total d'éléments
+- Intégration transparente avec le système de cache de l'ORM
 
 ## Personnalisation
 
