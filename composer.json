@@ -9,8 +9,7 @@
     },
     "require": {
         "php": "^8.0",
-        "illuminate/database": "^9.52",
-        "cocoon-projet/collection": "^0.0.3"
+        "illuminate/database": "^9.52"
     },
     "autoload-dev": {
         "psr-4": {

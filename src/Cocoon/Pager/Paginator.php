@@ -14,9 +14,6 @@ namespace Cocoon\Pager;
 
 use Traversable;
 use IteratorAggregate;
-use PDO;
-use PDOStatement;
-use Cocoon\Collection\Collection;
 use Illuminate\Database\Query\Builder as LaravelBuilder;
 use Cocoon\Database\Query\Builder as CocoonBuilder;
 use Illuminate\Support\Collection as LaravelCollection;
